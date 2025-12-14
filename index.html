@@ -3,273 +3,779 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vocal Mix Plugin</title>
+<title>Mix Master Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
-  --accent:#1aff8c;
-  --bg1:#0b2f1a;
-  --bg2:#04140b;
+  --accent: #00d4ff;
+  --accent-glow: rgba(0, 212, 255, 0.4);
+  --bg-dark: #0a0a0f;
+  --bg-panel: #12131a;
+  --bg-control: #1a1b24;
+  --text: #e8eaed;
+  --text-dim: #6b7280;
 }
 
 body {
-  margin:0;
-  background:#000;
-  font-family:Inter,system-ui,sans-serif;
-  display:flex;
-  justify-content:center;
-  padding:20px;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-dark);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
 }
 
-.plugin {
-  width:100%;
-  max-width:380px;
-  background:linear-gradient(180deg,var(--bg1),var(--bg2));
-  border-radius:22px;
-  padding:18px;
-  color:#eafff3;
-  box-shadow:0 25px 60px rgba(0,0,0,.6);
+/* MAIN PLUGIN CONTAINER */
+.mixer {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(145deg, #1a1b24, #0f1015);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 
+    0 25px 80px rgba(0,0,0,0.8),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 /* HEADER */
 .header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-.title {
-  font-weight:600;
-  font-size:14px;
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.theme-dots span {
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  display:inline-block;
-  cursor:pointer;
-  margin-left:6px;
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 /* LED */
 .led {
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:#123f2a;
-}
-.led.on {
-  background:var(--accent);
-  box-shadow:0 0 12px var(--accent);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1e2028;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
 }
 
-/* COVER */
-.cover {
-  height:190px;
-  border-radius:16px;
-  background:rgba(255,255,255,.05);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:48px;
-  margin:12px 0;
+.led.active {
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow), 0 0 24px var(--accent-glow);
 }
 
-/* CONTROLS */
-label {
-  font-size:11px;
-  opacity:.8;
+/* THEME PICKER */
+.themes {
+  display: flex;
+  gap: 6px;
 }
 
-input[type=file] {
-  width:100%;
-  margin-bottom:10px;
+.theme-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
 }
 
-.knob-wrap {
-  text-align:center;
-  margin:14px 0;
+.theme-dot:hover {
+  transform: scale(1.15);
+}
+
+.theme-dot.active {
+  border-color: white;
+}
+
+/* DISPLAY SCREEN */
+.display {
+  background: linear-gradient(180deg, #0d0e12, #080809);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.display-content {
+  text-align: center;
+}
+
+.track-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, var(--bg-control), var(--bg-panel));
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  font-size: 28px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.track-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.track-status {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* FILE INPUT */
+.file-input-wrap {
+  margin-top: 14px;
+}
+
+.file-label {
+  display: block;
+  padding: 12px 16px;
+  background: var(--bg-control);
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  border: 1px dashed rgba(255,255,255,0.1);
+  transition: all 0.2s ease;
+}
+
+.file-label:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.file-input {
+  display: none;
+}
+
+/* KNOBS SECTION */
+.knobs-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.knob-group {
+  text-align: center;
+}
+
+.knob-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 8px;
 }
 
 .knob {
-  width:130px;
-  height:130px;
-  border-radius:50%;
-  background:radial-gradient(circle at top,#fff,var(--accent));
-  margin:auto;
-  position:relative;
-  transition:transform .2s ease;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #2a2b36, #1a1b24);
+  box-shadow: 
+    0 8px 20px rgba(0,0,0,0.5),
+    inset 0 2px 0 rgba(255,255,255,0.08),
+    inset 0 -2px 4px rgba(0,0,0,0.3);
+  position: relative;
+  cursor: pointer;
 }
 
-.knob::after {
-  content:"";
-  width:5px;
-  height:36px;
-  background:#000;
-  position:absolute;
-  top:10px;
-  left:50%;
-  transform:translateX(-50%);
-  border-radius:3px;
+.knob::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60%;
+  height: 60%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, #22232c, #18191f);
+  border-radius: 50%;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
 }
 
-input[type=range] {
-  width:100%;
+.knob-indicator {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 4px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+  transform-origin: bottom center;
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
-.control {
-  margin-top:10px;
+.knob-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-button {
-  width:100%;
-  margin-top:14px;
-  padding:12px;
-  border:none;
-  border-radius:14px;
-  background:var(--accent);
-  color:#002b18;
-  font-weight:700;
-  cursor:pointer;
+.knob-value {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* SLIDERS */
+.slider-group {
+  margin-bottom: 16px;
+}
+
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.slider-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.slider-value {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg-control);
+  border-radius: 3px;
+  outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(145deg, #fff, #ccc);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(145deg, #fff, #ccc);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* BUTTONS */
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn {
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-play {
+  background: var(--accent);
+  color: #000;
+}
+
+.btn-play:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-download {
+  background: var(--bg-control);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.btn-download:hover {
+  background: #22232e;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* AUDIO PLAYER */
+.audio-wrap {
+  margin-top: 14px;
 }
 
 audio {
-  width:100%;
-  margin-top:10px;
+  width: 100%;
+  height: 36px;
+  border-radius: 8px;
 }
 
-/* DESKTOP */
-@media(min-width:900px){
-  body { padding:40px }
+/* RESPONSIVE */
+@media (max-width: 420px) {
+  .mixer {
+    padding: 16px;
+  }
+  
+  .knob-container {
+    width: 65px;
+    height: 65px;
+  }
+  
+  .knobs-section {
+    gap: 8px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="plugin">
+<div class="mixer">
+  <!-- HEADER -->
   <div class="header">
-    <div class="title">NOW PLAYING</div>
-    <div style="display:flex;align-items:center">
+    <div class="logo">
+      <div class="logo-icon">🎛️</div>
+      <span class="logo-text">Mix Master</span>
+    </div>
+    <div class="header-right">
       <div class="led" id="led"></div>
-      <div class="theme-dots">
-        <span style="background:#1aff8c" onclick="setTheme('#1aff8c','#0b2f1a','#04140b')"></span>
-        <span style="background:#5da9ff" onclick="setTheme('#5da9ff','#0b1e2f','#040d14')"></span>
-        <span style="background:#b67cff" onclick="setTheme('#b67cff','#1d0b2f','#0b0414')"></span>
-        <span style="background:#ff6b6b" onclick="setTheme('#ff6b6b','#2f0b0b','#140404')"></span>
+      <div class="themes">
+        <div class="theme-dot active" style="background:#00d4ff" onclick="setTheme('#00d4ff')"></div>
+        <div class="theme-dot" style="background:#a855f7" onclick="setTheme('#a855f7')"></div>
+        <div class="theme-dot" style="background:#22c55e" onclick="setTheme('#22c55e')"></div>
+        <div class="theme-dot" style="background:#f43f5e" onclick="setTheme('#f43f5e')"></div>
+        <div class="theme-dot" style="background:#f59e0b" onclick="setTheme('#f59e0b')"></div>
       </div>
     </div>
   </div>
 
-  <div class="cover">🎧</div>
-
-  <label>Upload Song</label>
-  <input type="file" id="file" accept="audio/*">
-
-  <div class="knob-wrap">
-    <label>Mix</label>
-    <div class="knob" id="knob"></div>
-    <input type="range" id="mix" min="0" max="100" value="40">
+  <!-- DISPLAY -->
+  <div class="display">
+    <div class="display-content">
+      <div class="track-icon">🎵</div>
+      <div class="track-name" id="trackName">No Track Loaded</div>
+      <div class="track-status" id="trackStatus">Upload a song to start</div>
+    </div>
+    <div class="file-input-wrap">
+      <label class="file-label" for="fileInput">
+        📁 Choose Audio File
+      </label>
+      <input type="file" id="fileInput" class="file-input" accept="audio/*">
+    </div>
   </div>
 
-  <div class="control">
-    <label>Clarity</label>
-    <input type="range" id="clarity" min="0" max="100" value="30">
+  <!-- KNOBS -->
+  <div class="knobs-section">
+    <div class="knob-group">
+      <div class="knob-container">
+        <div class="knob" id="knobBass">
+          <div class="knob-indicator" id="indBass"></div>
+        </div>
+      </div>
+      <div class="knob-label">Bass</div>
+      <div class="knob-value" id="valBass">50%</div>
+    </div>
+    <div class="knob-group">
+      <div class="knob-container">
+        <div class="knob" id="knobClarity">
+          <div class="knob-indicator" id="indClarity"></div>
+        </div>
+      </div>
+      <div class="knob-label">Clarity</div>
+      <div class="knob-value" id="valClarity">50%</div>
+    </div>
+    <div class="knob-group">
+      <div class="knob-container">
+        <div class="knob" id="knobPunch">
+          <div class="knob-indicator" id="indPunch"></div>
+        </div>
+      </div>
+      <div class="knob-label">Punch</div>
+      <div class="knob-value" id="valPunch">50%</div>
+    </div>
   </div>
 
-  <div class="control">
-    <label>Punch</label>
-    <input type="range" id="punch" min="0" max="100" value="50">
+  <!-- MASTER SLIDER -->
+  <div class="slider-group">
+    <div class="slider-header">
+      <span class="slider-label">Master Mix</span>
+      <span class="slider-value" id="masterVal">50%</span>
+    </div>
+    <input type="range" class="slider" id="masterSlider" min="0" max="100" value="50">
   </div>
 
-  <button onclick="process()">Download Mixed Song</button>
+  <!-- BUTTONS -->
+  <div class="buttons">
+    <button class="btn btn-play" id="btnPlay" onclick="processAndPlay()" disabled>
+      ▶️ Play Mix
+    </button>
+    <button class="btn btn-download" id="btnDownload" onclick="downloadMix()" disabled>
+      💾 Download
+    </button>
+  </div>
 
-  <audio id="player" controls></audio>
+  <!-- AUDIO OUTPUT -->
+  <div class="audio-wrap">
+    <audio id="audioPlayer" controls></audio>
+  </div>
 </div>
 
 <script>
-const knob = document.getElementById("knob");
-const mixSlider = document.getElementById("mix");
-const led = document.getElementById("led");
+// State
+let audioFile = null;
+let audioContext = null;
+let processedBuffer = null;
 
-// Rotate knob
-mixSlider.oninput = () => {
-  const deg = -135 + (mixSlider.value / 100) * 270;
-  knob.style.transform = `rotate(${deg}deg)`;
+// Knob values (0-100)
+const knobs = {
+  bass: 50,
+  clarity: 50,
+  punch: 50,
+  master: 50
 };
 
+// Elements
+const led = document.getElementById('led');
+const audioPlayer = document.getElementById('audioPlayer');
+const btnPlay = document.getElementById('btnPlay');
+const btnDownload = document.getElementById('btnDownload');
+
 // Theme switcher
-function setTheme(accent,bg1,bg2){
-  document.documentElement.style.setProperty("--accent",accent);
-  document.documentElement.style.setProperty("--bg1",bg1);
-  document.documentElement.style.setProperty("--bg2",bg2);
+function setTheme(color) {
+  document.documentElement.style.setProperty('--accent', color);
+  document.documentElement.style.setProperty('--accent-glow', color + '66');
+  
+  document.querySelectorAll('.theme-dot').forEach(dot => {
+    dot.classList.remove('active');
+    if (dot.style.background === color || dot.style.backgroundColor === color) {
+      dot.classList.add('active');
+    }
+  });
 }
 
-// Audio curve
-const curve = v => Math.pow(v/100,1.5);
-
-function process(){
-  const file = document.getElementById("file").files[0];
-  if(!file) return alert("Upload a song first");
-
-  const mix = curve(mixSlider.value);
-  const clarity = curve(document.getElementById("clarity").value);
-  const punch = curve(document.getElementById("punch").value);
-
-  const ctx = new AudioContext();
-  const reader = new FileReader();
-
-  reader.onload = async () => {
-    const buffer = await ctx.decodeAudioData(reader.result);
-    const src = ctx.createBufferSource();
-    src.buffer = buffer;
-
-    const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -24;
-    comp.ratio.value = 2 + punch * 6;
-
-    const eq = ctx.createBiquadFilter();
-    eq.type = "highshelf";
-    eq.frequency.value = 3000;
-    eq.gain.value = clarity * 10;
-
-    const gain = ctx.createGain();
-    gain.gain.value = 1 + mix * 0.4;
-
-    const dest = ctx.createMediaStreamDestination();
-
-    src.connect(comp);
-    comp.connect(eq);
-    eq.connect(gain);
-    gain.connect(dest);
-    gain.connect(ctx.destination);
-
-    src.start();
-    led.classList.add("on");
-
-    const rec = new MediaRecorder(dest.stream);
-    let chunks = [];
-
-    rec.ondataavailable = e => chunks.push(e.data);
-    rec.onstop = () => {
-      led.classList.remove("on");
-      const blob = new Blob(chunks,{type:"audio/webm"});
-      const url = URL.createObjectURL(blob);
-      document.getElementById("player").src = url;
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "mixed_song.webm";
-      a.click();
-    };
-
-    rec.start();
-    setTimeout(()=>rec.stop(), buffer.duration * 1000);
+// Knob rotation (drag to control)
+function setupKnob(knobId, indicatorId, valueId, knobKey) {
+  const knob = document.getElementById(knobId);
+  const indicator = document.getElementById(indicatorId);
+  const valueEl = document.getElementById(valueId);
+  
+  let isDragging = false;
+  let startY = 0;
+  let startValue = 0;
+  
+  const updateKnob = (val) => {
+    knobs[knobKey] = Math.max(0, Math.min(100, val));
+    const rotation = -135 + (knobs[knobKey] / 100) * 270;
+    indicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+    valueEl.textContent = Math.round(knobs[knobKey]) + '%';
   };
+  
+  knob.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startY = e.clientY;
+    startValue = knobs[knobKey];
+    document.body.style.cursor = 'ns-resize';
+  });
+  
+  knob.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    startY = e.touches[0].clientY;
+    startValue = knobs[knobKey];
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const delta = (startY - e.clientY) * 0.5;
+    updateKnob(startValue + delta);
+  });
+  
+  document.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    const delta = (startY - e.touches[0].clientY) * 0.5;
+    updateKnob(startValue + delta);
+  });
+  
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    document.body.style.cursor = '';
+  });
+  
+  document.addEventListener('touchend', () => {
+    isDragging = false;
+  });
+  
+  // Initialize rotation
+  updateKnob(knobs[knobKey]);
+}
 
-  reader.readAsArrayBuffer(file);
+// Setup all knobs
+setupKnob('knobBass', 'indBass', 'valBass', 'bass');
+setupKnob('knobClarity', 'indClarity', 'valClarity', 'clarity');
+setupKnob('knobPunch', 'indPunch', 'valPunch', 'punch');
+
+// Master slider
+const masterSlider = document.getElementById('masterSlider');
+const masterVal = document.getElementById('masterVal');
+
+masterSlider.addEventListener('input', () => {
+  knobs.master = masterSlider.value;
+  masterVal.textContent = knobs.master + '%';
+});
+
+// File input
+document.getElementById('fileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    audioFile = file;
+    document.getElementById('trackName').textContent = file.name;
+    document.getElementById('trackStatus').textContent = 'Ready to mix';
+    btnPlay.disabled = false;
+    btnDownload.disabled = false;
+  }
+});
+
+// Audio processing
+async function processAudio() {
+  if (!audioFile) return null;
+  
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  
+  const arrayBuffer = await audioFile.arrayBuffer();
+  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+  
+  // Create offline context for processing
+  const offlineCtx = new OfflineAudioContext(
+    audioBuffer.numberOfChannels,
+    audioBuffer.length,
+    audioBuffer.sampleRate
+  );
+  
+  const source = offlineCtx.createBufferSource();
+  source.buffer = audioBuffer;
+  
+  // Bass EQ
+  const bassEQ = offlineCtx.createBiquadFilter();
+  bassEQ.type = 'lowshelf';
+  bassEQ.frequency.value = 200;
+  bassEQ.gain.value = (knobs.bass - 50) * 0.3;
+  
+  // Clarity EQ (presence)
+  const clarityEQ = offlineCtx.createBiquadFilter();
+  clarityEQ.type = 'peaking';
+  clarityEQ.frequency.value = 3500;
+  clarityEQ.Q.value = 1;
+  clarityEQ.gain.value = (knobs.clarity - 50) * 0.2;
+  
+  // High shelf for air
+  const airEQ = offlineCtx.createBiquadFilter();
+  airEQ.type = 'highshelf';
+  airEQ.frequency.value = 8000;
+  airEQ.gain.value = (knobs.clarity - 50) * 0.15;
+  
+  // Compressor (punch)
+  const compressor = offlineCtx.createDynamicsCompressor();
+  compressor.threshold.value = -24 + (50 - knobs.punch) * 0.3;
+  compressor.ratio.value = 2 + (knobs.punch / 100) * 6;
+  compressor.attack.value = 0.003;
+  compressor.release.value = 0.15;
+  
+  // Master gain
+  const masterGain = offlineCtx.createGain();
+  masterGain.gain.value = 0.8 + (knobs.master / 100) * 0.6;
+  
+  // Connect chain
+  source.connect(bassEQ);
+  bassEQ.connect(clarityEQ);
+  clarityEQ.connect(airEQ);
+  airEQ.connect(compressor);
+  compressor.connect(masterGain);
+  masterGain.connect(offlineCtx.destination);
+  
+  source.start();
+  
+  return await offlineCtx.startRendering();
+}
+
+// Play processed audio
+async function processAndPlay() {
+  if (!audioFile) return;
+  
+  document.getElementById('trackStatus').textContent = 'Processing...';
+  led.classList.add('active');
+  
+  try {
+    processedBuffer = await processAudio();
+    
+    // Convert to blob for playback
+    const wav = audioBufferToWav(processedBuffer);
+    const blob = new Blob([wav], { type: 'audio/wav' });
+    const url = URL.createObjectURL(blob);
+    
+    audioPlayer.src = url;
+    audioPlayer.play();
+    
+    document.getElementById('trackStatus').textContent = 'Playing mixed version';
+  } catch (err) {
+    console.error(err);
+    document.getElementById('trackStatus').textContent = 'Error processing';
+    led.classList.remove('active');
+  }
+}
+
+// LED follows playback
+audioPlayer.addEventListener('play', () => led.classList.add('active'));
+audioPlayer.addEventListener('pause', () => led.classList.remove('active'));
+audioPlayer.addEventListener('ended', () => led.classList.remove('active'));
+
+// Download
+async function downloadMix() {
+  if (!audioFile) return;
+  
+  document.getElementById('trackStatus').textContent = 'Preparing download...';
+  
+  if (!processedBuffer) {
+    processedBuffer = await processAudio();
+  }
+  
+  const wav = audioBufferToWav(processedBuffer);
+  const blob = new Blob([wav], { type: 'audio/wav' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'mixed_' + audioFile.name.replace(/\.[^.]+$/, '') + '.wav';
+  a.click();
+  
+  document.getElementById('trackStatus').textContent = 'Download started';
+}
+
+// Convert AudioBuffer to WAV
+function audioBufferToWav(buffer) {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const format = 1;
+  const bitDepth = 16;
+  
+  const bytesPerSample = bitDepth / 8;
+  const blockAlign = numChannels * bytesPerSample;
+  
+  const dataLength = buffer.length * blockAlign;
+  const bufferLength = 44 + dataLength;
+  
+  const arrayBuffer = new ArrayBuffer(bufferLength);
+  const view = new DataView(arrayBuffer);
+  
+  const writeString = (offset, string) => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  };
+  
+  writeString(0, 'RIFF');
+  view.setUint32(4, bufferLength - 8, true);
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, format, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitDepth, true);
+  writeString(36, 'data');
+  view.setUint32(40, dataLength, true);
+  
+  const channels = [];
+  for (let i = 0; i < numChannels; i++) {
+    channels.push(buffer.getChannelData(i));
+  }
+  
+  let offset = 44;
+  for (let i = 0; i < buffer.length; i++) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      let sample = channels[ch][i];
+      sample = Math.max(-1, Math.min(1, sample));
+      sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+      view.setInt16(offset, sample, true);
+      offset += 2;
+    }
+  }
+  
+  return arrayBuffer;
 }
 </script>
 
