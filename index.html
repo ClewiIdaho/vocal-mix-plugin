@@ -1,1 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vocal Mix Plugin</title>
 
+<style>
+body {
+  background:#e9ecf2;
+  font-family: Inter, system-ui, sans-serif;
+  display:flex;
+  justify-content:center;
+  padding:30px;
+}
+
+.plugin {
+  width:360px;
+  background:#f4f6fb;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.screen {
+  background:#1b1d2c;
+  border-radius:14px;
+  height:160px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#8c7bff;
+  font-size:42px;
+}
+
+.controls {
+  margin-top:20px;
+  text-align:center;
+}
+
+.knob {
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  background:radial-gradient(circle at top,#fff,#cfd4e6);
+  box-shadow: inset 0 8px 14px rgba(0,0,0,.15),
+              0 10px 20px rgba(0,0,0,.15);
+  margin:0 auto;
+  position:relative;
+}
+
+.knob::after {
+  content:"";
+  width:6px;
+  height:40px;
+  background:#6c5cff;
+  position:absolute;
+  top:12px;
+  left:50%;
+  transform:translateX(-50%);
+  border-radius:3px;
+}
+
+input[type=range] {
+  width:100%;
+  margin-top:20px;
+}
+
+.labels {
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:#666;
+}
+
+button {
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#6c5cff;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+
+audio {
+  width:100%;
+  margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+<div class="plugin">
+
+  <div class="screen">🎵</div>
+
+  <input type="file" id="upload" accept="audio/*">
+
+  <div class="controls">
+    <div class="knob"></div>
+    <input type="range" id="mix" min="0" max="100" value="40">
+    <div class="labels">
+      <span>Low Mix</span>
+      <span>Heavy Mix</span>
+    </div>
+  </div>
+
+  <button onclick="playProcessed()">Play Mixed Version</button>
+
+  <audio id="player" controls></audio>
+
+</div>
+
+<script>
+let audioCtx, source, processed;
+
+function playProcessed() {
+  const file = document.getElementById("upload").files[0];
+  if (!file) return alert("Upload a song first");
+
+  const mix = document.getElementById("mix").value / 100;
+
+  audioCtx = new AudioContext();
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const buffer = await audioCtx.decodeAudioData(reader.result);
+
+    source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+
+    // Compressor
+    const compressor = audioCtx.createDynamicsCompressor();
+    compressor.threshold.value = -24;
+    compressor.ratio.value = 2 + mix * 6;
+
+    // EQ
+    const eq = audioCtx.createBiquadFilter();
+    eq.type = "peaking";
+    eq.frequency.value = 3500;
+    eq.gain.value = mix * 8;
+
+    // Saturation
+    const drive = audioCtx.createWaveShaper();
+    drive.curve = makeDistortionCurve(mix * 50);
+
+    source.connect(compressor);
+    compressor.connect(eq);
+    eq.connect(drive);
+    drive.connect(audioCtx.destination);
+
+    source.start();
+
+    document.getElementById("player").srcObject =
+      audioCtx.createMediaStreamDestination().stream;
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+function makeDistortionCurve(amount) {
+  const k = amount;
+  const samples = 44100;
+  const curve = new Float32Array(samples);
+  for (let i = 0; i < samples; i++) {
+    const x = (i * 2) / samples - 1;
+    curve[i] = (1 + k) * x / (1 + k * Math.abs(x));
+  }
+  return curve;
+}
+</script>
+</body>
+</html>
