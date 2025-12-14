@@ -15,12 +15,12 @@
 
 :root {
   --accent: #00d4ff;
-  --accent-glow: rgba(0, 212, 255, 0.5);
-  --bg-panel: rgba(18, 19, 26, 0.95);
-  --bg-control: rgba(26, 27, 36, 0.9);
-  --bg-dark: rgba(13, 14, 18, 0.9);
-  --text: #e8eaed;
-  --text-dim: #6b7280;
+  --accent-glow: rgba(0, 212, 255, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-highlight: rgba(255, 255, 255, 0.15);
+  --text: #f0f2f5;
+  --text-dim: rgba(255, 255, 255, 0.5);
 }
 
 html, body {
@@ -31,24 +31,41 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 16px;
+  margin: 0;
 }
 
-/* MAIN PLUGIN CONTAINER */
+/* GLASSMORPHISM CONTAINER */
 .mixer {
   width: 100%;
-  max-width: 440px;
-  background: linear-gradient(165deg, rgba(26, 27, 36, 0.97), rgba(15, 16, 21, 0.98));
-  border-radius: 28px;
-  padding: 22px;
+  max-width: 460px;
+  background: linear-gradient(135deg, rgba(30, 32, 45, 0.9), rgba(15, 17, 25, 0.95));
+  border-radius: 32px;
+  padding: 24px;
   box-shadow: 
-    0 30px 100px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+    0 40px 100px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--glass-border),
+    inset 0 1px 0 var(--glass-highlight),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glass shine effect */
+.mixer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 100%);
+  border-radius: 32px 32px 0 0;
+  pointer-events: none;
 }
 
 /* HEADER */
@@ -56,40 +73,54 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glass-border);
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, var(--accent), rgba(0, 212, 255, 0.6));
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--accent), rgba(0, 150, 200, 0.8));
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 4px 15px var(--accent-glow);
+  font-size: 20px;
+  box-shadow: 
+    0 4px 20px var(--accent-glow),
+    inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
 .logo-text {
   font-weight: 700;
-  font-size: 16px;
+  font-size: 18px;
   color: var(--text);
   letter-spacing: -0.5px;
+}
+
+.logo-badge {
+  font-size: 9px;
+  background: var(--accent);
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  margin-left: 6px;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 /* LED */
@@ -110,8 +141,8 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #1e2028;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--glass-border);
   transition: all 0.3s ease;
 }
 
@@ -119,30 +150,32 @@ body {
   background: var(--accent);
   box-shadow: 
     0 0 10px var(--accent),
-    0 0 20px var(--accent-glow),
-    0 0 40px var(--accent-glow);
-  animation: pulse 1s ease-in-out infinite;
+    0 0 25px var(--accent-glow),
+    0 0 50px var(--accent-glow);
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
 }
 
 /* THEME PICKER */
 .themes {
   display: flex;
-  gap: 5px;
+  gap: 6px;
 }
 
 .theme-dot {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
   transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
 .theme-dot:hover {
@@ -151,29 +184,74 @@ body {
 
 .theme-dot.active {
   border-color: white;
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
-/* DISPLAY SCREEN */
-.display {
-  background: linear-gradient(180deg, rgba(13, 14, 18, 0.95), rgba(8, 8, 9, 0.95));
-  border-radius: 18px;
-  padding: 18px;
-  margin-bottom: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+/* GLASS CARD */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
   position: relative;
   overflow: hidden;
 }
 
-/* WAVEFORM VISUALIZER */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--glass-highlight), transparent);
+}
+
+/* DISPLAY / WAVEFORM SECTION */
+.display {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+/* STATIC WAVEFORM (uploaded file) */
+.static-waveform {
+  height: 60px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.static-waveform canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.waveform-placeholder {
+  color: var(--text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* LIVE VISUALIZER */
 .visualizer-wrap {
   position: relative;
-  height: 80px;
-  margin-bottom: 14px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.4);
+  height: 50px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255,255,255,0.03);
 }
 
 .waveform {
@@ -183,120 +261,195 @@ body {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 0 10px;
+  padding: 0 8px;
 }
 
 .wave-bar {
   width: 3px;
-  min-height: 4px;
+  min-height: 3px;
   background: var(--accent);
   border-radius: 2px;
   transition: height 0.05s ease;
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 .wave-bar.active {
-  box-shadow: 0 0 8px var(--accent-glow);
+  opacity: 1;
+  box-shadow: 0 0 6px var(--accent-glow);
 }
 
-/* PEAK METER */
-.peak-meter {
+/* PEAK METERS */
+.meters {
   position: absolute;
-  right: 10px;
-  top: 10px;
-  bottom: 10px;
-  width: 8px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
+  right: 8px;
+  top: 8px;
+  bottom: 8px;
+  display: flex;
+  gap: 3px;
+}
+
+.meter {
+  width: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
   overflow: hidden;
   display: flex;
   flex-direction: column-reverse;
 }
 
-.peak-fill {
+.meter-fill {
   width: 100%;
-  background: linear-gradient(to top, #22c55e, #eab308, #ef4444);
+  background: linear-gradient(to top, #22c55e, #84cc16, #eab308, #ef4444);
   transition: height 0.1s ease;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 /* TRACK INFO */
 .track-info {
-  text-align: center;
-  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
 }
 
 .track-icon {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, var(--bg-control), var(--bg-panel));
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--glass-bg), rgba(0,0,0,0.3));
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 10px;
   font-size: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  flex-shrink: 0;
+}
+
+.track-details {
+  flex: 1;
+  min-width: 0;
 }
 
 .track-name {
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
-  padding: 0 10px;
+}
+
+.track-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  font-size: 10px;
+  color: var(--accent);
+  background: rgba(0, 212, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
 }
 
 .track-status {
-  font-size: 11px;
-  color: var(--accent);
+  font-size: 10px;
+  color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  font-weight: 500;
 }
 
 /* FILE INPUT */
 .file-input-wrap {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .file-label {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
+  gap: 10px;
+  padding: 14px 18px;
+  background: var(--glass-bg);
+  border-radius: 14px;
   text-align: center;
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
   color: var(--text);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border: 1px dashed var(--glass-border);
   transition: all 0.25s ease;
 }
 
 .file-label:hover {
   border-color: var(--accent);
-  background: rgba(0, 212, 255, 0.05);
+  background: rgba(0, 212, 255, 0.08);
   color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .file-input {
   display: none;
 }
 
+/* TOOLS ROW */
+.tools-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tool-btn {
+  flex: 1;
+  padding: 10px 8px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text-dim);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tool-btn span {
+  font-size: 16px;
+}
+
+.tool-btn:hover {
+  background: rgba(0, 212, 255, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tool-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+
+/* BPM TAP */
+.bpm-display {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
 /* KNOBS SECTION */
 .knobs-section {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
 .knob-group {
@@ -305,29 +458,30 @@ body {
 
 .knob-container {
   position: relative;
-  width: 70px;
-  height: 70px;
-  margin: 0 auto 6px;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 4px;
 }
 
 .knob {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(145deg, #2e2f3a, #1a1b24);
+  background: linear-gradient(145deg, rgba(60,62,80,0.9), rgba(30,32,45,0.9));
   box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 6px 20px rgba(0, 0, 0, 0.4),
     inset 0 2px 0 rgba(255, 255, 255, 0.1),
     inset 0 -2px 4px rgba(0, 0, 0, 0.3);
   position: relative;
   cursor: grab;
   transition: box-shadow 0.2s ease;
+  border: 1px solid var(--glass-border);
 }
 
 .knob:hover {
   box-shadow: 
-    0 6px 25px rgba(0, 0, 0, 0.6),
-    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    0 6px 25px rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15),
     inset 0 -2px 4px rgba(0, 0, 0, 0.3),
     0 0 0 2px var(--accent-glow);
 }
@@ -341,68 +495,151 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 55%;
-  height: 55%;
+  width: 50%;
+  height: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(145deg, #26272f, #1c1d24);
+  background: linear-gradient(145deg, rgba(40,42,55,0.9), rgba(25,27,35,0.9));
   border-radius: 50%;
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 .knob-indicator {
   position: absolute;
-  top: 6px;
+  top: 5px;
   left: 50%;
-  width: 4px;
-  height: 12px;
+  width: 3px;
+  height: 10px;
   background: var(--accent);
   border-radius: 2px;
-  transform-origin: center 29px;
+  transform-origin: center 25px;
   transform: translateX(-50%) rotate(0deg);
-  box-shadow: 0 0 10px var(--accent-glow);
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
 .knob-ring {
   position: absolute;
-  top: -4px;
-  left: -4px;
-  right: -4px;
-  bottom: -4px;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
   border-radius: 50%;
   border: 2px solid transparent;
   border-top-color: var(--accent);
-  opacity: 0.3;
+  opacity: 0.2;
   transform: rotate(-135deg);
-  transition: opacity 0.2s ease;
 }
 
 .knob:hover .knob-ring {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .knob-label {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 600;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
 }
 
 .knob-value {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--accent);
   font-weight: 600;
-  margin-top: 1px;
+}
+
+/* ADVANCED CONTROLS */
+.advanced-section {
+  margin-bottom: 14px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.toggle-advanced {
+  font-size: 9px;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.toggle-advanced:hover {
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.advanced-knobs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.advanced-knobs.show {
+  max-height: 120px;
+  opacity: 1;
+  margin-bottom: 14px;
+}
+
+/* PRESETS */
+.presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.preset-btn {
+  padding: 10px 6px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preset-btn:hover {
+  background: rgba(0, 212, 255, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.preset-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
 }
 
 /* MASTER SECTION */
 .master-section {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 14px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
   padding: 14px;
-  margin-bottom: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  margin-bottom: 14px;
 }
 
 .master-header {
@@ -420,25 +657,25 @@ body {
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .master-icon {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .master-value {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--accent);
   font-weight: 700;
 }
 
 .slider-track {
   position: relative;
-  height: 8px;
+  height: 10px;
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  overflow: hidden;
+  border-radius: 5px;
+  overflow: visible;
 }
 
 .slider-fill {
@@ -446,10 +683,10 @@ body {
   left: 0;
   top: 0;
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), rgba(0, 212, 255, 0.6));
-  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent), rgba(0, 180, 220, 0.7));
+  border-radius: 5px;
   transition: width 0.1s ease;
-  box-shadow: 0 0 10px var(--accent-glow);
+  box-shadow: 0 0 15px var(--accent-glow);
 }
 
 .slider {
@@ -468,59 +705,68 @@ body {
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(145deg, #fff, #d0d0d0);
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(145deg, #fff, #e0e0e0);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 
+    0 2px 10px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255,255,255,1);
   margin-top: -6px;
 }
 
 .slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(145deg, #fff, #d0d0d0);
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(145deg, #fff, #e0e0e0);
   border-radius: 50%;
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
-/* PRESETS */
-.presets {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+/* EXPORT OPTIONS */
+.export-section {
+  margin-bottom: 14px;
 }
 
-.preset-btn {
+.export-options {
+  display: flex;
+  gap: 6px;
+}
+
+.export-btn {
   flex: 1;
-  min-width: calc(33% - 6px);
   padding: 10px 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 10px;
   color: var(--text-dim);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-align: center;
 }
 
-.preset-btn:hover {
-  background: rgba(0, 212, 255, 0.1);
+.export-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.preset-btn.active {
-  background: var(--accent);
-  color: #000;
+.export-btn.active {
+  background: rgba(0, 212, 255, 0.15);
   border-color: var(--accent);
+  color: var(--accent);
+}
+
+.export-btn small {
+  display: block;
+  font-size: 8px;
+  opacity: 0.7;
+  margin-top: 2px;
 }
 
 /* BUTTONS */
@@ -531,7 +777,7 @@ body {
 }
 
 .btn {
-  padding: 14px 16px;
+  padding: 16px 18px;
   border: none;
   border-radius: 14px;
   font-size: 13px;
@@ -542,28 +788,46 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+  pointer-events: none;
 }
 
 .btn-play {
-  background: linear-gradient(135deg, var(--accent), rgba(0, 180, 220, 1));
+  background: linear-gradient(135deg, var(--accent), rgba(0, 160, 200, 1));
   color: #000;
-  box-shadow: 0 4px 20px var(--accent-glow);
+  box-shadow: 
+    0 6px 25px var(--accent-glow),
+    inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
 .btn-play:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 30px var(--accent-glow);
+  box-shadow: 
+    0 10px 40px var(--accent-glow),
+    inset 0 1px 0 rgba(255,255,255,0.3);
 }
 
 .btn-download {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg);
   color: var(--text);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
 }
 
 .btn-download:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
 .btn:disabled {
@@ -572,12 +836,41 @@ body {
   transform: none !important;
 }
 
+/* PROCESSING INDICATOR */
+.processing-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin-top: 12px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.processing-bar.active {
+  opacity: 1;
+}
+
+.processing-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), rgba(0,212,255,0.5), var(--accent));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 2px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* AUDIO PLAYER */
 .audio-wrap {
   margin-top: 14px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  padding: 10px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 12px;
 }
 
 audio {
@@ -596,7 +889,7 @@ audio::-webkit-media-controls-panel {
   text-align: center;
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid var(--glass-border);
 }
 
 .footer-text {
@@ -607,37 +900,42 @@ audio::-webkit-media-controls-panel {
 
 /* RESPONSIVE */
 @media (max-width: 480px) {
-  .mixer {
-    padding: 16px;
-    border-radius: 22px;
+  body {
+    padding: 8px;
   }
   
-  .knobs-section {
+  .mixer {
+    padding: 16px;
+    border-radius: 24px;
+  }
+  
+  .knobs-section,
+  .advanced-knobs {
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+    gap: 4px;
   }
   
   .knob-container {
-    width: 58px;
-    height: 58px;
+    width: 50px;
+    height: 50px;
   }
   
   .knob-indicator {
-    height: 10px;
-    transform-origin: center 24px;
-  }
-  
-  .visualizer-wrap {
-    height: 60px;
+    height: 8px;
+    transform-origin: center 21px;
   }
   
   .presets {
-    gap: 6px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
   }
   
-  .preset-btn {
-    padding: 8px 6px;
-    font-size: 9px;
+  .tools-row {
+    flex-wrap: wrap;
+  }
+  
+  .tool-btn {
+    min-width: calc(25% - 6px);
   }
 }
 </style>
@@ -650,7 +948,10 @@ audio::-webkit-media-controls-panel {
   <div class="header">
     <div class="logo">
       <div class="logo-icon">🎛️</div>
-      <span class="logo-text">Mix Master Pro</span>
+      <div>
+        <span class="logo-text">Mix Master</span>
+        <span class="logo-badge">PRO</span>
+      </div>
     </div>
     <div class="header-right">
       <div class="led-wrap">
@@ -669,19 +970,30 @@ audio::-webkit-media-controls-panel {
 
   <!-- DISPLAY -->
   <div class="display">
-    <!-- WAVEFORM -->
+    <!-- STATIC WAVEFORM -->
+    <div class="static-waveform" id="staticWaveform">
+      <span class="waveform-placeholder">Waveform Preview</span>
+      <canvas id="waveformCanvas"></canvas>
+    </div>
+    
+    <!-- LIVE VISUALIZER -->
     <div class="visualizer-wrap">
       <div class="waveform" id="waveform"></div>
-      <div class="peak-meter">
-        <div class="peak-fill" id="peakFill" style="height: 0%"></div>
+      <div class="meters">
+        <div class="meter"><div class="meter-fill" id="meterL" style="height:0%"></div></div>
+        <div class="meter"><div class="meter-fill" id="meterR" style="height:0%"></div></div>
       </div>
     </div>
     
     <!-- TRACK INFO -->
     <div class="track-info">
       <div class="track-icon" id="trackIcon">🎵</div>
-      <div class="track-name" id="trackName">No Track Loaded</div>
-      <div class="track-status" id="trackStatus">Upload a song to begin</div>
+      <div class="track-details">
+        <div class="track-name" id="trackName">No Track Loaded</div>
+        <div class="track-meta" id="trackMeta">
+          <span class="track-status" id="trackStatus">Upload a song to begin</span>
+        </div>
+      </div>
     </div>
     
     <!-- FILE INPUT -->
@@ -694,7 +1006,31 @@ audio::-webkit-media-controls-panel {
     </div>
   </div>
 
-  <!-- KNOBS -->
+  <!-- TOOLS ROW -->
+  <div class="tools-row">
+    <button class="tool-btn" id="bpmBtn" onclick="tapBPM()">
+      <span>🥁</span>
+      <div class="bpm-display" id="bpmDisplay">---</div>
+      <div>Tap BPM</div>
+    </button>
+    <button class="tool-btn" onclick="toggleMono()">
+      <span>🔊</span>
+      <div id="monoDisplay">Stereo</div>
+    </button>
+    <button class="tool-btn" onclick="resetAll()">
+      <span>↺</span>
+      <div>Reset</div>
+    </button>
+    <button class="tool-btn" onclick="randomize()">
+      <span>🎲</span>
+      <div>Random</div>
+    </button>
+  </div>
+
+  <!-- MAIN KNOBS -->
+  <div class="section-header">
+    <span class="section-title">Mix Controls</span>
+  </div>
   <div class="knobs-section">
     <div class="knob-group">
       <div class="knob-container">
@@ -738,6 +1074,56 @@ audio::-webkit-media-controls-panel {
     </div>
   </div>
 
+  <!-- ADVANCED CONTROLS -->
+  <div class="advanced-section">
+    <div class="section-header">
+      <span class="section-title">Advanced</span>
+      <button class="toggle-advanced" onclick="toggleAdvanced()">Show More</button>
+    </div>
+    <div class="advanced-knobs" id="advancedKnobs">
+      <div class="knob-group">
+        <div class="knob-container">
+          <div class="knob" id="knobReverb">
+            <div class="knob-ring"></div>
+            <div class="knob-indicator" id="indReverb"></div>
+          </div>
+        </div>
+        <div class="knob-label">Reverb</div>
+        <div class="knob-value" id="valReverb">20%</div>
+      </div>
+      <div class="knob-group">
+        <div class="knob-container">
+          <div class="knob" id="knobWidth">
+            <div class="knob-ring"></div>
+            <div class="knob-indicator" id="indWidth"></div>
+          </div>
+        </div>
+        <div class="knob-label">Width</div>
+        <div class="knob-value" id="valWidth">50%</div>
+      </div>
+      <div class="knob-group">
+        <div class="knob-container">
+          <div class="knob" id="knobDeEss">
+            <div class="knob-ring"></div>
+            <div class="knob-indicator" id="indDeEss"></div>
+          </div>
+        </div>
+        <div class="knob-label">De-Ess</div>
+        <div class="knob-value" id="valDeEss">30%</div>
+      </div>
+      <div class="knob-group">
+        <div class="knob-container">
+          <div class="knob" id="knobGate">
+            <div class="knob-ring"></div>
+            <div class="knob-indicator" id="indGate"></div>
+          </div>
+        </div>
+        <div class="knob-label">Gate</div>
+        <div class="knob-value" id="valGate">0%</div>
+      </div>
+    </div>
+  </div>
+
   <!-- PRESETS -->
   <div class="presets">
     <button class="preset-btn" onclick="applyPreset('clean')">Clean</button>
@@ -745,7 +1131,7 @@ audio::-webkit-media-controls-panel {
     <button class="preset-btn" onclick="applyPreset('bright')">Bright</button>
     <button class="preset-btn" onclick="applyPreset('punch')">Punchy</button>
     <button class="preset-btn" onclick="applyPreset('hiphop')">Hip-Hop</button>
-    <button class="preset-btn" onclick="applyPreset('radio')">Radio</button>
+    <button class="preset-btn" onclick="applyPreset('radio')">Radio Ready</button>
   </div>
 
   <!-- MASTER -->
@@ -760,14 +1146,40 @@ audio::-webkit-media-controls-panel {
     </div>
   </div>
 
+  <!-- EXPORT OPTIONS -->
+  <div class="export-section">
+    <div class="section-header">
+      <span class="section-title">Export Quality</span>
+    </div>
+    <div class="export-options">
+      <button class="export-btn" onclick="setQuality('standard')">
+        Standard
+        <small>44.1kHz / 16-bit</small>
+      </button>
+      <button class="export-btn active" onclick="setQuality('high')">
+        High
+        <small>48kHz / 16-bit</small>
+      </button>
+      <button class="export-btn" onclick="setQuality('studio')">
+        Studio
+        <small>48kHz / 24-bit</small>
+      </button>
+    </div>
+  </div>
+
   <!-- BUTTONS -->
   <div class="buttons">
     <button class="btn btn-play" id="btnPlay" onclick="processAndPlay()" disabled>
       ▶ Play Mix
     </button>
     <button class="btn btn-download" id="btnDownload" onclick="downloadMix()" disabled>
-      ⬇ Download
+      ⬇ Download WAV
     </button>
+  </div>
+
+  <!-- PROCESSING BAR -->
+  <div class="processing-bar" id="processingBar">
+    <div class="processing-fill"></div>
   </div>
 
   <!-- AUDIO OUTPUT -->
@@ -777,7 +1189,7 @@ audio::-webkit-media-controls-panel {
 
   <!-- FOOTER -->
   <div class="footer">
-    <div class="footer-text">Drag knobs to adjust • Click presets for quick settings</div>
+    <div class="footer-text">Drag knobs • Tap BPM • Click presets • Professional mixing in your browser</div>
   </div>
 </div>
 
@@ -786,18 +1198,20 @@ audio::-webkit-media-controls-panel {
 let audioFile = null;
 let audioContext = null;
 let analyser = null;
-let sourceNode = null;
 let processedBuffer = null;
 let isPlaying = false;
 let animationId = null;
+let isMono = false;
+let exportQuality = 'high';
 
 const knobs = {
-  bass: 50,
-  mid: 50,
-  clarity: 50,
-  punch: 50,
+  bass: 50, mid: 50, clarity: 50, punch: 50,
+  reverb: 20, width: 50, deess: 30, gate: 0,
   master: 50
 };
+
+// BPM tap
+let tapTimes = [];
 
 // ========== ELEMENTS ==========
 const led = document.getElementById('led');
@@ -805,15 +1219,17 @@ const audioPlayer = document.getElementById('audioPlayer');
 const btnPlay = document.getElementById('btnPlay');
 const btnDownload = document.getElementById('btnDownload');
 const waveformEl = document.getElementById('waveform');
-const peakFill = document.getElementById('peakFill');
 const sliderFill = document.getElementById('sliderFill');
+const processingBar = document.getElementById('processingBar');
+const waveformCanvas = document.getElementById('waveformCanvas');
+const canvasCtx = waveformCanvas.getContext('2d');
 
 // ========== INIT WAVEFORM BARS ==========
-const numBars = 50;
+const numBars = 45;
 for (let i = 0; i < numBars; i++) {
   const bar = document.createElement('div');
   bar.className = 'wave-bar';
-  bar.style.height = '4px';
+  bar.style.height = '3px';
   waveformEl.appendChild(bar);
 }
 const waveBars = waveformEl.querySelectorAll('.wave-bar');
@@ -821,7 +1237,7 @@ const waveBars = waveformEl.querySelectorAll('.wave-bar');
 // ========== THEME ==========
 function setTheme(color) {
   document.documentElement.style.setProperty('--accent', color);
-  document.documentElement.style.setProperty('--accent-glow', color + '80');
+  document.documentElement.style.setProperty('--accent-glow', color + '60');
   
   document.querySelectorAll('.theme-dot').forEach(dot => {
     dot.classList.remove('active');
@@ -836,6 +1252,8 @@ function setupKnob(knobId, indicatorId, valueId, knobKey) {
   const knob = document.getElementById(knobId);
   const indicator = document.getElementById(indicatorId);
   const valueEl = document.getElementById(valueId);
+  
+  if (!knob) return;
   
   let isDragging = false;
   let startY = 0;
@@ -857,7 +1275,7 @@ function setupKnob(knobId, indicatorId, valueId, knobKey) {
   
   const onMove = (y) => {
     if (!isDragging) return;
-    const delta = (startY - y) * 0.5;
+    const delta = (startY - y) * 0.6;
     updateKnob(startValue + delta);
   };
   
@@ -866,20 +1284,27 @@ function setupKnob(knobId, indicatorId, valueId, knobKey) {
     knob.style.cursor = 'grab';
   };
   
-  knob.addEventListener('mousedown', (e) => onStart(e.clientY));
-  knob.addEventListener('touchstart', (e) => onStart(e.touches[0].clientY));
+  knob.addEventListener('mousedown', (e) => { e.preventDefault(); onStart(e.clientY); });
+  knob.addEventListener('touchstart', (e) => { onStart(e.touches[0].clientY); }, {passive: true});
   document.addEventListener('mousemove', (e) => onMove(e.clientY));
-  document.addEventListener('touchmove', (e) => onMove(e.touches[0].clientY));
+  document.addEventListener('touchmove', (e) => onMove(e.touches[0].clientY), {passive: true});
   document.addEventListener('mouseup', onEnd);
   document.addEventListener('touchend', onEnd);
   
   updateKnob(knobs[knobKey]);
 }
 
+// Main knobs
 setupKnob('knobBass', 'indBass', 'valBass', 'bass');
 setupKnob('knobMid', 'indMid', 'valMid', 'mid');
 setupKnob('knobClarity', 'indClarity', 'valClarity', 'clarity');
 setupKnob('knobPunch', 'indPunch', 'valPunch', 'punch');
+
+// Advanced knobs
+setupKnob('knobReverb', 'indReverb', 'valReverb', 'reverb');
+setupKnob('knobWidth', 'indWidth', 'valWidth', 'width');
+setupKnob('knobDeEss', 'indDeEss', 'valDeEss', 'deess');
+setupKnob('knobGate', 'indGate', 'valGate', 'gate');
 
 // ========== MASTER SLIDER ==========
 const masterSlider = document.getElementById('masterSlider');
@@ -891,14 +1316,22 @@ masterSlider.addEventListener('input', () => {
   sliderFill.style.width = knobs.master + '%';
 });
 
+// ========== TOGGLE ADVANCED ==========
+function toggleAdvanced() {
+  const adv = document.getElementById('advancedKnobs');
+  const btn = document.querySelector('.toggle-advanced');
+  adv.classList.toggle('show');
+  btn.textContent = adv.classList.contains('show') ? 'Hide' : 'Show More';
+}
+
 // ========== PRESETS ==========
 const presets = {
-  clean:  { bass: 45, mid: 50, clarity: 55, punch: 40, master: 50 },
-  warm:   { bass: 65, mid: 55, clarity: 40, punch: 45, master: 55 },
-  bright: { bass: 40, mid: 50, clarity: 70, punch: 50, master: 50 },
-  punch:  { bass: 55, mid: 50, clarity: 50, punch: 75, master: 60 },
-  hiphop: { bass: 70, mid: 45, clarity: 60, punch: 70, master: 65 },
-  radio:  { bass: 50, mid: 55, clarity: 65, punch: 60, master: 55 }
+  clean:  { bass: 45, mid: 50, clarity: 55, punch: 35, reverb: 15, width: 50, deess: 40, gate: 0, master: 50 },
+  warm:   { bass: 65, mid: 55, clarity: 40, punch: 45, reverb: 25, width: 55, deess: 20, gate: 0, master: 55 },
+  bright: { bass: 40, mid: 50, clarity: 75, punch: 45, reverb: 20, width: 60, deess: 50, gate: 0, master: 50 },
+  punch:  { bass: 60, mid: 50, clarity: 55, punch: 80, reverb: 10, width: 45, deess: 30, gate: 10, master: 60 },
+  hiphop: { bass: 75, mid: 45, clarity: 60, punch: 75, reverb: 15, width: 65, deess: 35, gate: 5, master: 65 },
+  radio:  { bass: 50, mid: 55, clarity: 70, punch: 65, reverb: 20, width: 55, deess: 45, gate: 5, master: 60 }
 };
 
 function applyPreset(name) {
@@ -910,23 +1343,93 @@ function applyPreset(name) {
   
   Object.keys(p).forEach(key => {
     knobs[key] = p[key];
-    
-    if (key === 'master') {
-      masterSlider.value = p[key];
-      masterVal.textContent = p[key] + '%';
-      sliderFill.style.width = p[key] + '%';
-    } else {
-      const indicator = document.getElementById('ind' + key.charAt(0).toUpperCase() + key.slice(1));
-      const valueEl = document.getElementById('val' + key.charAt(0).toUpperCase() + key.slice(1));
-      const rotation = -135 + (p[key] / 100) * 270;
-      indicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
-      valueEl.textContent = p[key] + '%';
-    }
+    updateKnobDisplay(key, p[key]);
   });
 }
 
+function updateKnobDisplay(key, val) {
+  if (key === 'master') {
+    masterSlider.value = val;
+    masterVal.textContent = val + '%';
+    sliderFill.style.width = val + '%';
+    return;
+  }
+  
+  const keyMap = {
+    bass: 'Bass', mid: 'Mid', clarity: 'Clarity', punch: 'Punch',
+    reverb: 'Reverb', width: 'Width', deess: 'DeEss', gate: 'Gate'
+  };
+  
+  const indicator = document.getElementById('ind' + keyMap[key]);
+  const valueEl = document.getElementById('val' + keyMap[key]);
+  
+  if (indicator && valueEl) {
+    const rotation = -135 + (val / 100) * 270;
+    indicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+    valueEl.textContent = val + '%';
+  }
+}
+
+// ========== TOOLS ==========
+function tapBPM() {
+  const now = Date.now();
+  tapTimes.push(now);
+  
+  if (tapTimes.length > 1) {
+    // Keep last 8 taps
+    if (tapTimes.length > 8) tapTimes.shift();
+    
+    let totalDiff = 0;
+    for (let i = 1; i < tapTimes.length; i++) {
+      totalDiff += tapTimes[i] - tapTimes[i-1];
+    }
+    const avgDiff = totalDiff / (tapTimes.length - 1);
+    const bpm = Math.round(60000 / avgDiff);
+    document.getElementById('bpmDisplay').textContent = bpm;
+  }
+  
+  // Reset if no tap for 2 seconds
+  setTimeout(() => {
+    if (Date.now() - tapTimes[tapTimes.length-1] > 2000) {
+      tapTimes = [];
+    }
+  }, 2100);
+}
+
+function toggleMono() {
+  isMono = !isMono;
+  document.getElementById('monoDisplay').textContent = isMono ? 'Mono' : 'Stereo';
+  knobs.width = isMono ? 0 : 50;
+  updateKnobDisplay('width', knobs.width);
+}
+
+function resetAll() {
+  Object.keys(knobs).forEach(key => {
+    knobs[key] = key === 'reverb' ? 20 : key === 'deess' ? 30 : key === 'gate' ? 0 : 50;
+    updateKnobDisplay(key, knobs[key]);
+  });
+  document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+}
+
+function randomize() {
+  Object.keys(knobs).forEach(key => {
+    if (key === 'gate') {
+      knobs[key] = Math.floor(Math.random() * 30);
+    } else {
+      knobs[key] = 30 + Math.floor(Math.random() * 40);
+    }
+    updateKnobDisplay(key, knobs[key]);
+  });
+}
+
+function setQuality(q) {
+  exportQuality = q;
+  document.querySelectorAll('.export-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
 // ========== FILE INPUT ==========
-document.getElementById('fileInput').addEventListener('change', (e) => {
+document.getElementById('fileInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (file) {
     audioFile = file;
@@ -935,10 +1438,66 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
     document.getElementById('trackIcon').textContent = '🎧';
     btnPlay.disabled = false;
     btnDownload.disabled = false;
+    
+    // Draw static waveform
+    drawStaticWaveform(file);
+    
+    // Show file size
+    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+    document.getElementById('trackMeta').innerHTML = `
+      <span class="meta-tag">${sizeMB} MB</span>
+      <span class="track-status" id="trackStatus">Ready to mix</span>
+    `;
   }
 });
 
-// ========== WAVEFORM ANIMATION ==========
+// ========== STATIC WAVEFORM ==========
+async function drawStaticWaveform(file) {
+  const container = document.getElementById('staticWaveform');
+  const canvas = document.getElementById('waveformCanvas');
+  
+  // Show canvas, hide placeholder
+  container.querySelector('.waveform-placeholder').style.display = 'none';
+  canvas.style.display = 'block';
+  
+  // Set canvas size
+  canvas.width = container.offsetWidth;
+  canvas.height = container.offsetHeight;
+  
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const arrayBuffer = await file.arrayBuffer();
+  const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+  
+  const data = audioBuffer.getChannelData(0);
+  const step = Math.ceil(data.length / canvas.width);
+  const amp = canvas.height / 2;
+  
+  canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  canvasCtx.beginPath();
+  canvasCtx.moveTo(0, amp);
+  
+  for (let i = 0; i < canvas.width; i++) {
+    let min = 1.0, max = -1.0;
+    for (let j = 0; j < step; j++) {
+      const datum = data[(i * step) + j];
+      if (datum < min) min = datum;
+      if (datum > max) max = datum;
+    }
+    canvasCtx.lineTo(i, (1 + min) * amp);
+    canvasCtx.lineTo(i, (1 + max) * amp);
+  }
+  
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  canvasCtx.strokeStyle = accent;
+  canvasCtx.lineWidth = 1;
+  canvasCtx.stroke();
+  
+  ctx.close();
+}
+
+// ========== LIVE WAVEFORM ANIMATION ==========
 function startWaveformAnimation() {
   if (!analyser) return;
   
@@ -950,17 +1509,19 @@ function startWaveformAnimation() {
     analyser.getByteFrequencyData(dataArray);
     
     const step = Math.floor(dataArray.length / numBars);
-    let maxVal = 0;
+    let maxL = 0, maxR = 0;
     
     waveBars.forEach((bar, i) => {
       const value = dataArray[i * step] || 0;
-      const height = Math.max(4, (value / 255) * 70);
+      const height = Math.max(3, (value / 255) * 45);
       bar.style.height = height + 'px';
       bar.classList.toggle('active', value > 100);
-      if (value > maxVal) maxVal = value;
+      if (i < numBars/2 && value > maxL) maxL = value;
+      if (i >= numBars/2 && value > maxR) maxR = value;
     });
     
-    peakFill.style.height = (maxVal / 255) * 100 + '%';
+    document.getElementById('meterL').style.height = (maxL / 255) * 100 + '%';
+    document.getElementById('meterR').style.height = (maxR / 255) * 100 + '%';
     
     animationId = requestAnimationFrame(animate);
   };
@@ -974,10 +1535,11 @@ function stopWaveformAnimation() {
     animationId = null;
   }
   waveBars.forEach(bar => {
-    bar.style.height = '4px';
+    bar.style.height = '3px';
     bar.classList.remove('active');
   });
-  peakFill.style.height = '0%';
+  document.getElementById('meterL').style.height = '0%';
+  document.getElementById('meterR').style.height = '0%';
 }
 
 // ========== AUDIO PROCESSING ==========
@@ -998,58 +1560,104 @@ async function processAudio() {
   const source = offlineCtx.createBufferSource();
   source.buffer = audioBuffer;
   
-  // Bass EQ
+  // === EQ CHAIN ===
+  
+  // Bass
   const bassEQ = offlineCtx.createBiquadFilter();
   bassEQ.type = 'lowshelf';
   bassEQ.frequency.value = 150;
-  bassEQ.gain.value = (knobs.bass - 50) * 0.25;
+  bassEQ.gain.value = (knobs.bass - 50) * 0.24;
   
-  // Mid EQ
+  // Mid
   const midEQ = offlineCtx.createBiquadFilter();
   midEQ.type = 'peaking';
   midEQ.frequency.value = 1000;
-  midEQ.Q.value = 0.8;
-  midEQ.gain.value = (knobs.mid - 50) * 0.2;
+  midEQ.Q.value = 0.7;
+  midEQ.gain.value = (knobs.mid - 50) * 0.18;
   
   // Clarity (presence)
   const clarityEQ = offlineCtx.createBiquadFilter();
   clarityEQ.type = 'peaking';
   clarityEQ.frequency.value = 3500;
-  clarityEQ.Q.value = 1.2;
+  clarityEQ.Q.value = 1.0;
   clarityEQ.gain.value = (knobs.clarity - 50) * 0.2;
   
-  // Air (high shelf)
+  // Air
   const airEQ = offlineCtx.createBiquadFilter();
   airEQ.type = 'highshelf';
   airEQ.frequency.value = 10000;
-  airEQ.gain.value = (knobs.clarity - 50) * 0.12;
+  airEQ.gain.value = (knobs.clarity - 50) * 0.1;
+  
+  // De-esser (high frequency reduction)
+  const deEsser = offlineCtx.createBiquadFilter();
+  deEsser.type = 'peaking';
+  deEsser.frequency.value = 6500;
+  deEsser.Q.value = 2;
+  deEsser.gain.value = -(knobs.deess * 0.12);
+  
+  // === DYNAMICS ===
+  
+  // Gate (using highpass as simple gate simulation)
+  const gate = offlineCtx.createBiquadFilter();
+  gate.type = 'highpass';
+  gate.frequency.value = 20 + (knobs.gate * 2);
   
   // Compressor
   const compressor = offlineCtx.createDynamicsCompressor();
-  compressor.threshold.value = -20 + (50 - knobs.punch) * 0.3;
+  compressor.threshold.value = -18 + (50 - knobs.punch) * 0.3;
   compressor.ratio.value = 1.5 + (knobs.punch / 100) * 5;
   compressor.attack.value = 0.002;
-  compressor.release.value = 0.12;
-  compressor.knee.value = 6;
+  compressor.release.value = 0.1;
+  compressor.knee.value = 5;
+  
+  // === SPATIAL ===
+  
+  // Stereo width (simple gain adjustment)
+  const widthGain = offlineCtx.createGain();
+  widthGain.gain.value = 0.7 + (knobs.width / 100) * 0.6;
+  
+  // Reverb simulation (using delay + feedback)
+  const reverbDelay = offlineCtx.createDelay();
+  reverbDelay.delayTime.value = 0.03;
+  
+  const reverbGain = offlineCtx.createGain();
+  reverbGain.gain.value = knobs.reverb / 300;
+  
+  const reverbFilter = offlineCtx.createBiquadFilter();
+  reverbFilter.type = 'lowpass';
+  reverbFilter.frequency.value = 3000;
+  
+  // === OUTPUT ===
   
   // Master gain
   const masterGain = offlineCtx.createGain();
-  masterGain.gain.value = 0.7 + (knobs.master / 100) * 0.7;
+  masterGain.gain.value = 0.6 + (knobs.master / 100) * 0.8;
   
   // Limiter
   const limiter = offlineCtx.createDynamicsCompressor();
-  limiter.threshold.value = -2;
+  limiter.threshold.value = -1.5;
   limiter.ratio.value = 20;
   limiter.attack.value = 0.001;
   limiter.release.value = 0.05;
   
-  // Connect chain
-  source.connect(bassEQ);
+  // === CONNECT CHAIN ===
+  source.connect(gate);
+  gate.connect(bassEQ);
   bassEQ.connect(midEQ);
   midEQ.connect(clarityEQ);
   clarityEQ.connect(airEQ);
-  airEQ.connect(compressor);
-  compressor.connect(masterGain);
+  airEQ.connect(deEsser);
+  deEsser.connect(compressor);
+  compressor.connect(widthGain);
+  
+  // Reverb parallel path
+  widthGain.connect(reverbDelay);
+  reverbDelay.connect(reverbFilter);
+  reverbFilter.connect(reverbGain);
+  reverbGain.connect(masterGain);
+  
+  // Main path
+  widthGain.connect(masterGain);
   masterGain.connect(limiter);
   limiter.connect(offlineCtx.destination);
   
@@ -1065,6 +1673,7 @@ async function processAndPlay() {
   document.getElementById('trackStatus').textContent = 'Processing...';
   led.classList.add('active');
   btnPlay.disabled = true;
+  processingBar.classList.add('active');
   
   try {
     processedBuffer = await processAudio();
@@ -1075,7 +1684,7 @@ async function processAndPlay() {
     
     audioPlayer.src = url;
     
-    // Setup analyser for visualization
+    // Setup analyser
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const source = audioContext.createMediaElementSource(audioPlayer);
     analyser = audioContext.createAnalyser();
@@ -1090,12 +1699,14 @@ async function processAndPlay() {
     document.getElementById('trackStatus').textContent = 'Now Playing';
     document.getElementById('trackIcon').textContent = '🔊';
     btnPlay.disabled = false;
+    processingBar.classList.remove('active');
     
   } catch (err) {
     console.error(err);
     document.getElementById('trackStatus').textContent = 'Error processing';
     led.classList.remove('active');
     btnPlay.disabled = false;
+    processingBar.classList.remove('active');
   }
 }
 
@@ -1123,11 +1734,13 @@ audioPlayer.addEventListener('ended', () => {
 });
 
 // ========== DOWNLOAD ==========
+// ========== DOWNLOAD ==========
 async function downloadMix() {
   if (!audioFile) return;
   
   document.getElementById('trackStatus').textContent = 'Preparing download...';
   btnDownload.disabled = true;
+  processingBar.classList.add('active');
   
   try {
     if (!processedBuffer) {
@@ -1145,10 +1758,12 @@ async function downloadMix() {
     
     document.getElementById('trackStatus').textContent = 'Download complete';
   } catch (err) {
+    console.error(err);
     document.getElementById('trackStatus').textContent = 'Download failed';
   }
   
   btnDownload.disabled = false;
+  processingBar.classList.remove('active');
 }
 
 // ========== WAV ENCODER ==========
@@ -1156,7 +1771,7 @@ function audioBufferToWav(buffer) {
   const numChannels = buffer.numberOfChannels;
   const sampleRate = buffer.sampleRate;
   const format = 1;
-  const bitDepth = 16;
+  const bitDepth = exportQuality === 'studio' ? 24 : 16;
   
   const bytesPerSample = bitDepth / 8;
   const blockAlign = numChannels * bytesPerSample;
@@ -1196,9 +1811,18 @@ function audioBufferToWav(buffer) {
     for (let ch = 0; ch < numChannels; ch++) {
       let sample = channels[ch][i];
       sample = Math.max(-1, Math.min(1, sample));
-      sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-      view.setInt16(offset, sample, true);
-      offset += 2;
+      
+      if (bitDepth === 16) {
+        sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+        view.setInt16(offset, sample, true);
+        offset += 2;
+      } else {
+        sample = sample * 0x7FFFFF;
+        view.setInt8(offset, sample & 0xFF);
+        view.setInt8(offset + 1, (sample >> 8) & 0xFF);
+        view.setInt8(offset + 2, (sample >> 16) & 0xFF);
+        offset += 3;
+      }
     }
   }
   
