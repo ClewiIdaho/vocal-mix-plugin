@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Vocal Mix Plugin</title>
+<title>Clean Vocal Mix</title>
 
 <style>
 body {
-  background:#e9ecf2;
+  background:#050b08;
   font-family: Inter, system-ui, sans-serif;
   display:flex;
   justify-content:center;
@@ -14,47 +14,56 @@ body {
 }
 
 .plugin {
-  width:360px;
-  background:#f4f6fb;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 20px 40px rgba(0,0,0,.15);
+  width:340px;
+  background:linear-gradient(180deg,#0b2f1a,#04140b);
+  border-radius:20px;
+  padding:18px;
+  color:#e6fff1;
+  box-shadow:0 20px 50px rgba(0,0,0,.6);
 }
 
-.screen {
-  background:#1b1d2c;
+.cover {
+  background:#0e3d23;
   border-radius:14px;
-  height:160px;
+  height:180px;
   display:flex;
   align-items:center;
   justify-content:center;
-  color:#8c7bff;
-  font-size:42px;
+  font-size:44px;
+  margin-bottom:12px;
 }
 
-.controls {
-  margin-top:20px;
+label {
+  font-size:12px;
+  opacity:.8;
+}
+
+input[type=file] {
+  width:100%;
+  margin-bottom:12px;
+}
+
+.knob-wrap {
   text-align:center;
+  margin:14px 0;
 }
 
 .knob {
-  width:160px;
-  height:160px;
+  width:140px;
+  height:140px;
   border-radius:50%;
-  background:radial-gradient(circle at top,#fff,#cfd4e6);
-  box-shadow: inset 0 8px 14px rgba(0,0,0,.15),
-              0 10px 20px rgba(0,0,0,.15);
-  margin:0 auto;
+  background:radial-gradient(circle at top,#1aff8c,#0b3f23);
+  margin:auto;
   position:relative;
 }
 
 .knob::after {
   content:"";
-  width:6px;
-  height:40px;
-  background:#6c5cff;
+  width:5px;
+  height:38px;
+  background:#fff;
   position:absolute;
-  top:12px;
+  top:10px;
   left:50%;
   transform:translateX(-50%);
   border-radius:3px;
@@ -62,114 +71,127 @@ body {
 
 input[type=range] {
   width:100%;
-  margin-top:20px;
 }
 
-.labels {
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  color:#666;
+.control {
+  margin-top:12px;
 }
 
 button {
   width:100%;
-  margin-top:15px;
   padding:12px;
   border:none;
   border-radius:12px;
-  background:#6c5cff;
-  color:white;
+  background:#1aff8c;
+  color:#003b1f;
   font-weight:700;
   cursor:pointer;
+  margin-top:14px;
 }
 
 audio {
   width:100%;
-  margin-top:15px;
+  margin-top:10px;
 }
 </style>
 </head>
 
 <body>
+
 <div class="plugin">
+  <div class="cover">🎧</div>
 
-  <div class="screen">🎵</div>
+  <label>Upload Song</label>
+  <input type="file" id="file" accept="audio/*">
 
-  <input type="file" id="upload" accept="audio/*">
-
-  <div class="controls">
+  <div class="knob-wrap">
+    <label>Mix Amount</label>
     <div class="knob"></div>
     <input type="range" id="mix" min="0" max="100" value="40">
-    <div class="labels">
-      <span>Low Mix</span>
-      <span>Heavy Mix</span>
-    </div>
   </div>
 
-  <button onclick="playProcessed()">Play Mixed Version</button>
+  <div class="control">
+    <label>Clarity</label>
+    <input type="range" id="clarity" min="0" max="100" value="30">
+  </div>
+
+  <div class="control">
+    <label>Punch</label>
+    <input type="range" id="punch" min="0" max="100" value="50">
+  </div>
+
+  <button onclick="process()">Download Mixed Song</button>
 
   <audio id="player" controls></audio>
-
 </div>
 
 <script>
-let audioCtx, source, processed;
+let ctx;
 
-function playProcessed() {
-  const file = document.getElementById("upload").files[0];
+function process() {
+  const file = document.getElementById("file").files[0];
   if (!file) return alert("Upload a song first");
 
-  const mix = document.getElementById("mix").value / 100;
+  const mix = mixVal();
+  const clarity = clarityVal();
+  const punch = punchVal();
 
-  audioCtx = new AudioContext();
-
+  ctx = new AudioContext();
   const reader = new FileReader();
-  reader.onload = async () => {
-    const buffer = await audioCtx.decodeAudioData(reader.result);
 
-    source = audioCtx.createBufferSource();
+  reader.onload = async () => {
+    const buffer = await ctx.decodeAudioData(reader.result);
+    const source = ctx.createBufferSource();
     source.buffer = buffer;
 
-    // Compressor
-    const compressor = audioCtx.createDynamicsCompressor();
+    const compressor = ctx.createDynamicsCompressor();
     compressor.threshold.value = -24;
-    compressor.ratio.value = 2 + mix * 6;
+    compressor.ratio.value = 2 + punch * 0.06;
 
-    // EQ
-    const eq = audioCtx.createBiquadFilter();
+    const eq = ctx.createBiquadFilter();
     eq.type = "peaking";
     eq.frequency.value = 3500;
-    eq.gain.value = mix * 8;
+    eq.gain.value = clarity * 0.08;
 
-    // Saturation
-    const drive = audioCtx.createWaveShaper();
-    drive.curve = makeDistortionCurve(mix * 50);
+    const gain = ctx.createGain();
+    gain.gain.value = 1 + mix * 0.01;
+
+    const dest = ctx.createMediaStreamDestination();
 
     source.connect(compressor);
     compressor.connect(eq);
-    eq.connect(drive);
-    drive.connect(audioCtx.destination);
+    eq.connect(gain);
+    gain.connect(dest);
+    gain.connect(ctx.destination);
 
     source.start();
 
-    document.getElementById("player").srcObject =
-      audioCtx.createMediaStreamDestination().stream;
+    const mediaRecorder = new MediaRecorder(dest.stream);
+    let chunks = [];
+
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(chunks, { type: "audio/webm" });
+      const url = URL.createObjectURL(blob);
+      document.getElementById("player").src = url;
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mixed_song.webm";
+      a.click();
+    };
+
+    mediaRecorder.start();
+    setTimeout(() => mediaRecorder.stop(), buffer.duration * 1000);
   };
 
   reader.readAsArrayBuffer(file);
 }
 
-function makeDistortionCurve(amount) {
-  const k = amount;
-  const samples = 44100;
-  const curve = new Float32Array(samples);
-  for (let i = 0; i < samples; i++) {
-    const x = (i * 2) / samples - 1;
-    curve[i] = (1 + k) * x / (1 + k * Math.abs(x));
-  }
-  return curve;
-}
+const mixVal = () => document.getElementById("mix").value;
+const clarityVal = () => document.getElementById("clarity").value;
+const punchVal = () => document.getElementById("punch").value;
 </script>
+
 </body>
 </html>
