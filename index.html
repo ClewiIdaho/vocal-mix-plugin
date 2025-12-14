@@ -2,45 +2,90 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Clean Vocal Mix</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocal Mix Plugin</title>
 
 <style>
+:root {
+  --accent:#1aff8c;
+  --bg1:#0b2f1a;
+  --bg2:#04140b;
+}
+
 body {
-  background:#050b08;
-  font-family: Inter, system-ui, sans-serif;
+  margin:0;
+  background:#000;
+  font-family:Inter,system-ui,sans-serif;
   display:flex;
   justify-content:center;
-  padding:30px;
+  padding:20px;
 }
 
 .plugin {
-  width:340px;
-  background:linear-gradient(180deg,#0b2f1a,#04140b);
-  border-radius:20px;
+  width:100%;
+  max-width:380px;
+  background:linear-gradient(180deg,var(--bg1),var(--bg2));
+  border-radius:22px;
   padding:18px;
-  color:#e6fff1;
-  box-shadow:0 20px 50px rgba(0,0,0,.6);
+  color:#eafff3;
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
 }
 
+/* HEADER */
+.header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.title {
+  font-weight:600;
+  font-size:14px;
+}
+
+.theme-dots span {
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  display:inline-block;
+  cursor:pointer;
+  margin-left:6px;
+}
+
+/* LED */
+.led {
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#123f2a;
+}
+.led.on {
+  background:var(--accent);
+  box-shadow:0 0 12px var(--accent);
+}
+
+/* COVER */
 .cover {
-  background:#0e3d23;
-  border-radius:14px;
-  height:180px;
+  height:190px;
+  border-radius:16px;
+  background:rgba(255,255,255,.05);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:44px;
-  margin-bottom:12px;
+  font-size:48px;
+  margin:12px 0;
 }
 
+/* CONTROLS */
 label {
-  font-size:12px;
+  font-size:11px;
   opacity:.8;
 }
 
 input[type=file] {
   width:100%;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
 .knob-wrap {
@@ -49,19 +94,20 @@ input[type=file] {
 }
 
 .knob {
-  width:140px;
-  height:140px;
+  width:130px;
+  height:130px;
   border-radius:50%;
-  background:radial-gradient(circle at top,#1aff8c,#0b3f23);
+  background:radial-gradient(circle at top,#fff,var(--accent));
   margin:auto;
   position:relative;
+  transition:transform .2s ease;
 }
 
 .knob::after {
   content:"";
   width:5px;
-  height:38px;
-  background:#fff;
+  height:36px;
+  background:#000;
   position:absolute;
   top:10px;
   left:50%;
@@ -74,24 +120,29 @@ input[type=range] {
 }
 
 .control {
-  margin-top:12px;
+  margin-top:10px;
 }
 
 button {
   width:100%;
+  margin-top:14px;
   padding:12px;
   border:none;
-  border-radius:12px;
-  background:#1aff8c;
-  color:#003b1f;
+  border-radius:14px;
+  background:var(--accent);
+  color:#002b18;
   font-weight:700;
   cursor:pointer;
-  margin-top:14px;
 }
 
 audio {
   width:100%;
   margin-top:10px;
+}
+
+/* DESKTOP */
+@media(min-width:900px){
+  body { padding:40px }
 }
 </style>
 </head>
@@ -99,14 +150,27 @@ audio {
 <body>
 
 <div class="plugin">
+  <div class="header">
+    <div class="title">NOW PLAYING</div>
+    <div style="display:flex;align-items:center">
+      <div class="led" id="led"></div>
+      <div class="theme-dots">
+        <span style="background:#1aff8c" onclick="setTheme('#1aff8c','#0b2f1a','#04140b')"></span>
+        <span style="background:#5da9ff" onclick="setTheme('#5da9ff','#0b1e2f','#040d14')"></span>
+        <span style="background:#b67cff" onclick="setTheme('#b67cff','#1d0b2f','#0b0414')"></span>
+        <span style="background:#ff6b6b" onclick="setTheme('#ff6b6b','#2f0b0b','#140404')"></span>
+      </div>
+    </div>
+  </div>
+
   <div class="cover">🎧</div>
 
   <label>Upload Song</label>
   <input type="file" id="file" accept="audio/*">
 
   <div class="knob-wrap">
-    <label>Mix Amount</label>
-    <div class="knob"></div>
+    <label>Mix</label>
+    <div class="knob" id="knob"></div>
     <input type="range" id="mix" min="0" max="100" value="40">
   </div>
 
@@ -126,52 +190,72 @@ audio {
 </div>
 
 <script>
-let ctx;
+const knob = document.getElementById("knob");
+const mixSlider = document.getElementById("mix");
+const led = document.getElementById("led");
 
-function process() {
+// Rotate knob
+mixSlider.oninput = () => {
+  const deg = -135 + (mixSlider.value / 100) * 270;
+  knob.style.transform = `rotate(${deg}deg)`;
+};
+
+// Theme switcher
+function setTheme(accent,bg1,bg2){
+  document.documentElement.style.setProperty("--accent",accent);
+  document.documentElement.style.setProperty("--bg1",bg1);
+  document.documentElement.style.setProperty("--bg2",bg2);
+}
+
+// Audio curve
+const curve = v => Math.pow(v/100,1.5);
+
+function process(){
   const file = document.getElementById("file").files[0];
-  if (!file) return alert("Upload a song first");
+  if(!file) return alert("Upload a song first");
 
-  const mix = mixVal();
-  const clarity = clarityVal();
-  const punch = punchVal();
+  const mix = curve(mixSlider.value);
+  const clarity = curve(document.getElementById("clarity").value);
+  const punch = curve(document.getElementById("punch").value);
 
-  ctx = new AudioContext();
+  const ctx = new AudioContext();
   const reader = new FileReader();
 
   reader.onload = async () => {
     const buffer = await ctx.decodeAudioData(reader.result);
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
 
-    const compressor = ctx.createDynamicsCompressor();
-    compressor.threshold.value = -24;
-    compressor.ratio.value = 2 + punch * 0.06;
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -24;
+    comp.ratio.value = 2 + punch * 6;
 
     const eq = ctx.createBiquadFilter();
-    eq.type = "peaking";
-    eq.frequency.value = 3500;
-    eq.gain.value = clarity * 0.08;
+    eq.type = "highshelf";
+    eq.frequency.value = 3000;
+    eq.gain.value = clarity * 10;
 
     const gain = ctx.createGain();
-    gain.gain.value = 1 + mix * 0.01;
+    gain.gain.value = 1 + mix * 0.4;
 
     const dest = ctx.createMediaStreamDestination();
 
-    source.connect(compressor);
-    compressor.connect(eq);
+    src.connect(comp);
+    comp.connect(eq);
     eq.connect(gain);
     gain.connect(dest);
     gain.connect(ctx.destination);
 
-    source.start();
+    src.start();
+    led.classList.add("on");
 
-    const mediaRecorder = new MediaRecorder(dest.stream);
+    const rec = new MediaRecorder(dest.stream);
     let chunks = [];
 
-    mediaRecorder.ondataavailable = e => chunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "audio/webm" });
+    rec.ondataavailable = e => chunks.push(e.data);
+    rec.onstop = () => {
+      led.classList.remove("on");
+      const blob = new Blob(chunks,{type:"audio/webm"});
       const url = URL.createObjectURL(blob);
       document.getElementById("player").src = url;
 
@@ -181,16 +265,12 @@ function process() {
       a.click();
     };
 
-    mediaRecorder.start();
-    setTimeout(() => mediaRecorder.stop(), buffer.duration * 1000);
+    rec.start();
+    setTimeout(()=>rec.stop(), buffer.duration * 1000);
   };
 
   reader.readAsArrayBuffer(file);
 }
-
-const mixVal = () => document.getElementById("mix").value;
-const clarityVal = () => document.getElementById("clarity").value;
-const punchVal = () => document.getElementById("punch").value;
 </script>
 
 </body>
